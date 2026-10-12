@@ -27,17 +27,25 @@ class BlockService:
         short_uuid = await self.short_uuid_gen.get_short_id(uuid)
 
         obj_name = f'{short_uuid}.txt'
-        await self.storage.upload(obj_name, text)
+        result = await self.storage.upload(obj_name, text)
 
-        datetime_to_rm = datetime.now() + timedelta(days=3)
-        data = {
-            'short_uuid': short_uuid,
-            'object_name': obj_name,
-            'ttl': datetime_to_rm
-        }
-        await self.repo.update(uuid, data)
+        if result:
 
-        return short_uuid
+            datetime_to_rm = datetime.now() + timedelta(days=3)
+            data = {
+                'short_uuid': short_uuid,
+                'object_name': obj_name,
+                'ttl': datetime_to_rm
+            }
+            await self.repo.update(uuid, data)
+            return short_uuid
+
+        else:
+
+            await self.repo.remove(uuid)
+            return None
+
+
 
 
 
@@ -46,3 +54,17 @@ class BlockService:
 
     def delete_block(self):
         ...
+
+    async def remove_expired_blocks(self):
+
+        list_blocks = await self.repo.get_blocks_with_expired_ttl()
+        print(list_blocks)
+        for block in list_blocks:
+            await self.storage.remove(block)
+
+        list_uuid_blocks = await self.repo.get_uuid_blocks_with_expired_ttl()
+        print(list_uuid_blocks)
+        for uuid_block in list_uuid_blocks:
+            await self.repo.remove(uuid_block)
+
+

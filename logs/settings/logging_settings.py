@@ -54,6 +54,15 @@ logging_config = {
             'filters': ['info_filter'],
             'encoding': 'utf-8'
         },
+        'custom_apscheduler': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': 'logs/apscheduler.log',
+            'when': 'midnight',
+            'atTime': time(9, 0),
+            'backupCount': 7,
+            'formatter': 'lite_formatter',
+            'encoding': 'utf-8'
+        },
     },
     'loggers': {
         '__main__': {
@@ -79,6 +88,11 @@ logging_config = {
         'api.fastapi.routers.ping': {
             'level': 'INFO',
             'handlers': ['default', 'info_file', 'error_file'],
+            'propagate': False
+        },
+        'apscheduler': {
+            'level': 'DEBUG',
+            'handlers': ['custom_apscheduler'],
             'propagate': False
         },
     },
