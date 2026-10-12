@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import RowMapping, select, update
+from sqlalchemy import RowMapping, func, select, update
 
 from db.models import Block
 from repo.base import BaseRepository
@@ -55,3 +55,33 @@ class BlockRepository(BaseRepository[Block]):
 
             await session.execute(stmt)
             await session.commit()
+
+    async def remove(self, uuid: UUID) -> bool:
+
+        async with self.db_session_maker() as session:
+
+            obj = await session.get(Block, uuid)
+            if obj is None:
+                return False
+
+            await session.delete(obj)
+            await session.commit()
+            return True
+
+    async def get_blocks_with_expired_ttl(self):
+
+        async with self.db_session_maker() as session:
+
+            query = (select(Block.object_name).where(
+                Block.ttl >= func.current_date()))
+            result = await session.execute(query)
+            return result.scalars().all()
+
+    async def get_uuid_blocks_with_expired_ttl(self):
+
+        async with self.db_session_maker() as session:
+
+            query = (select(Block.uuid).where(
+                Block.ttl >= func.current_date()))
+            result = await session.execute(query)
+            return result.scalars().all()

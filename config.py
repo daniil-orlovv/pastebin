@@ -22,7 +22,15 @@ class StorageConfig:
     port: int
     login: str
     pswd: str
-    files_dir: str
+    bucket_name: str
+
+@dataclass
+class RedisConfig:
+    """Параметры работы с Storage S3."""
+
+    host: str
+    db: int
+    port: str
 
 
 
@@ -33,6 +41,7 @@ class Config:
     db_url: str
     asgi: ASGIConfig
     storage: StorageConfig
+    redis_config: RedisConfig
 
 
 def load_config(path: str | None = None) -> Config:
@@ -55,7 +64,12 @@ def load_config(path: str | None = None) -> Config:
                 port=int(env('STORAGE_PORT')),
                 login=str(env('STORAGE_LOGIN')),
                 pswd=str(env('STORAGE_PSWD')),
-                files_dir=str(env('STORAGE_FILES_DIR'))
+                bucket_name=str(env('BUCKET_NAME'))
+            ),
+            redis_config=RedisConfig(
+                host=env('REDIS_HOST'),
+                db=env('REDIS_DB'),
+                port=env('REDIS_PORT'),
             )
         )
 

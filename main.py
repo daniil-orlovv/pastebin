@@ -12,6 +12,7 @@ from db.manager import DBManager
 from repo.blocks import BlockRepository
 from services.blocks import BlockService
 from services.hash_gen import ShortUuidGenerator
+from services.scheduler.manager import SchedulerManager
 from services.storage import Storage
 
 dictConfig(logging_config)
@@ -48,12 +49,16 @@ async def main():
             'login': config.storage.login,
             'pswd': config.storage.pswd
         }
-        files_dir = config.storage.files_dir
-        storage = Storage(access_data_storage, files_dir)
+        bucket_name = config.storage.bucket_name
+        storage = Storage(access_data_storage, bucket_name)
         hash_gen = ShortUuidGenerator()
 
         repo = BlockRepository(session_maker)
         service = BlockService(repo, storage, hash_gen)
+
+        scheduler = SchedulerManager(session_maker, config, service)
+        await scheduler.add_job_rm_object()
+        await scheduler.start()
 
         app = await init_api(service)
         await start_server(app, config)
