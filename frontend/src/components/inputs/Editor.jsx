@@ -32,10 +32,11 @@ const Editor = ({blocks, block, setBlocks, setBlock}) => {
       }),
     });
     const result = await response.json()
-    const final_url = `localhost:3000/blocks/get/` + result.hash_id
     console.log(result)
     console.log('Блок создался на бэке');
-    navigate('/created', { state: { url: final_url } })
+    navigate('/created', {
+      state: { hash_id: result.hash_id, views: result.views },
+    });
 
     setBlock('');
 
