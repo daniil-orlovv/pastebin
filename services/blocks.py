@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from repo.blocks import BlockRepository
 from services.hash_gen import ShortUuidGenerator
@@ -18,9 +18,14 @@ class BlockService:
 
         uuid = await self.short_uuid_gen.get_uuid(short_uuid)
         block = await self.repo.get(uuid)
-        return block
+        if not block:
+            return None, None
+        await self.repo.add_one_view(uuid)
+        text = await self.storage.get(block['object_name'])
+        ttl = block.get('ttl')
+        return text, ttl
 
-    async def create_block(self, text, ttl):
+    async def create_block(self, text: str, ttl: datetime):
         """..."""
 
         uuid = await self.repo.create()
@@ -31,11 +36,10 @@ class BlockService:
 
         if result:
 
-            datetime_to_rm = datetime.now() + timedelta(days=3)
             data = {
                 'short_uuid': short_uuid,
                 'object_name': obj_name,
-                'ttl': datetime_to_rm
+                'ttl': ttl
             }
             await self.repo.update(uuid, data)
             return short_uuid

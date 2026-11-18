@@ -1,9 +1,8 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime
+from sqlalchemy import UUID, Column, DateTime, Integer
 from sqlalchemy.types import String
-from sqlalchemy import UUID
 
 from db.base import Base
 
@@ -17,4 +16,6 @@ class Block(Base):
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime)
     ttl = Column(DateTime)
+    views = Column(Integer, nullable=False, default=0, server_default='0')
+
 

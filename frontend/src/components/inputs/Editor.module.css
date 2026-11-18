@@ -1,0 +1,26 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.textarea {
+    border-radius: 3%;
+    border-style: solid;
+    width: 400px;
+    height: 200px;
+    padding: 20px;
+    resize: none;
+}
+
+.form_inputs {
+    display: flex;
+    align-items: center;
+    margin: 3px;
+    padding: 5px;
+    border: 1px solid turquoise;
+    border-radius: 3%;
+}

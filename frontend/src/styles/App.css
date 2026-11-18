@@ -1,0 +1,17 @@
+#root {
+    display: flex;
+    justify-content: center;
+    font-family: 'Manrope', sans-serif;
+}
+
+.result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    justify-content: space-around;
+}
+.result__id {
+    color: red;
+    margin-left: 30px;
+}
