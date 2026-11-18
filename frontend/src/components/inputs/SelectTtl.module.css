@@ -1,0 +1,9 @@
+.SelectTtl__p {
+    text-align: center;
+    margin: 1px;
+}
+
+.SelectTtl__datetime {
+    display: flex;
+    gap: 2px;
+}
