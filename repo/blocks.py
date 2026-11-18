@@ -25,7 +25,8 @@ class BlockRepository(BaseRepository[Block]):
                     Block.object_name,
                     Block.created_at,
                     Block.updated_at,
-                    Block.ttl
+                    Block.ttl,
+                    Block.views
                     ).where(
                         Block.uuid == uuid))
 
@@ -85,3 +86,16 @@ class BlockRepository(BaseRepository[Block]):
                 Block.ttl >= func.current_date()))
             result = await session.execute(query)
             return result.scalars().all()
+
+    async def add_one_view(self, uuid: UUID):
+
+        async with self.db_session_maker() as session:
+
+            stmt = (
+            update(Block)
+            .where(Block.uuid == uuid)
+            .values(views=Block.views + 1)
+        )
+
+            await session.execute(stmt)
+            await session.commit()

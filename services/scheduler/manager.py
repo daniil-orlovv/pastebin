@@ -77,7 +77,7 @@ class SchedulerManager:
             self.scheduler.add_job(
                 remove_expired_blocks_job,
                 trigger='interval',
-                minutes=2,
+                minutes=30,
                 id=job_id,
                 replace_existing=True,
             )

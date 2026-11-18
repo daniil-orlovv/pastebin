@@ -42,12 +42,20 @@ class Storage:
         )
         return result.object_name
 
-    async def get(self, object_name: str):
-
-        self.client.get_object(
-            self.bucket_name,
-            object_name
-        )
+    async def get(self, object_name: str) -> str:
+        response = None
+        try:
+            response = self.client.get_object(
+                self.bucket_name,
+                object_name
+            )
+            # Читаем байты и переводим в строку UTF-8
+            return response.read().decode("utf-8")
+        finally:
+            # Обязательно закрываем поток и освобождаем соединение в пуле
+            if response:
+                response.close()
+                response.release_conn()
 
     async def remove(self, object_name):
         try:

@@ -1,7 +1,8 @@
 import logging
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
+from api.schemas.block_create import BlockCreate
 from services.blocks import BlockService
 
 
@@ -21,14 +22,12 @@ class CreateRouter:
         """Устанавливает роутер для эндпоинта '/create'."""
 
         @self.router.post("/create")
-        async def create_block(request: Request):
+        async def create_block(data: BlockCreate):
             """Обрабатывает запросы, приходящие на эндпоинт /create."""
-            data = await request.json()
-            print(data)
 
             hash_id = await self.service.create_block(
-                data['text'],
-                data['ttl'])
+                data.text,
+                data.ttl)
             return {'hash_id': hash_id}
 
 

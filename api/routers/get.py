@@ -1,9 +1,11 @@
 import logging
+import re
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, status
 
 from services.blocks import BlockService
 
+SHORT_UUID_RE = re.compile(r'^[2-9A-HJ-NP-Za-km-z]{22}$')
 
 class GetRouter:
     """Класс для управлением роутера для эндпоинта '/api/get'."""
@@ -24,8 +26,26 @@ class GetRouter:
         async def get_block(short_uuid: str):
             """Обрабатывает запросы, приходящие на эндпоинт /get."""
 
-            block = await self.service.get_block(short_uuid)
-            return {'block': block}
+            if not SHORT_UUID_RE.fullmatch(short_uuid):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail='Введите корректный uuid',
+                )
+
+            block, ttl = await self.service.get_block(short_uuid)
+            if not block:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail='Блок не найден',
+                )
+            if not ttl:
+                return {
+                    'block': block
+                }
+            return {
+                'block': block,
+                'ttl': ttl.strftime('%d.%m.%Y %H:%M'),
+            }
 
 
     async def _handle_result(self, data: dict) -> list:
