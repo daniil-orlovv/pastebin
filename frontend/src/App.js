@@ -34,7 +34,7 @@ function App() {
       <Route path='/created' element={
         <CreatedPage></CreatedPage>
       }/>
-      <Route path="/blocks/get/:hash_url" element={
+      <Route path="/:hash_id" element={
         <Block></Block>
       } />
     </Routes>

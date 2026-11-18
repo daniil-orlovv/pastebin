@@ -1,8 +1,21 @@
+from dataclasses import dataclass
 from datetime import datetime
+
+from sqlalchemy import RowMapping
 
 from repo.blocks import BlockRepository
 from services.hash_gen import ShortUuidGenerator
 from services.storage import Storage
+
+@dataclass(frozen=True, slots=True)
+class BlockData:
+    """
+        ---
+    """
+
+    text: str
+    ttl: datetime
+    views: int
 
 
 class BlockService:
@@ -14,16 +27,16 @@ class BlockService:
         self.storage = storage
         self.short_uuid_gen = short_uuid_gen
 
-    async def get_block(self, short_uuid: str):
+    async def get_block(self, short_uuid: str) -> BlockData | None:
 
         uuid = await self.short_uuid_gen.get_uuid(short_uuid)
         block = await self.repo.get(uuid)
         if not block:
-            return None, None
+            return None
+        block_data = await self.create_block_obj(block)
         await self.repo.add_one_view(uuid)
-        text = await self.storage.get(block['object_name'])
-        ttl = block.get('ttl')
-        return text, ttl
+
+        return block_data
 
     async def create_block(self, text: str, ttl: datetime):
         """..."""
@@ -48,6 +61,20 @@ class BlockService:
 
             await self.repo.remove(uuid)
             return None
+
+    async def create_block_obj(self, block: RowMapping) -> BlockData:
+        """Преобразует данные блока в объект BlockData."""
+
+        object_name = block.get('object_name')
+        text = await self.storage.get(object_name)
+
+        block_data = BlockData(
+            text=text,
+            ttl=block.get('ttl', ''),
+            views=block.get('views', 0)
+        )
+
+        return block_data
 
 
 

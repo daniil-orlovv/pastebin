@@ -32,19 +32,16 @@ class GetRouter:
                     detail='Введите корректный uuid',
                 )
 
-            block, ttl = await self.service.get_block(short_uuid)
+            block = await self.service.get_block(short_uuid)
             if not block:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail='Блок не найден',
                 )
-            if not ttl:
-                return {
-                    'block': block
-                }
             return {
-                'block': block,
-                'ttl': ttl.strftime('%d.%m.%Y %H:%M'),
+                'text': block.text,
+                'ttl': block.ttl.strftime('%d.%m.%Y %H:%M'),
+                'views': block.views
             }
 
 

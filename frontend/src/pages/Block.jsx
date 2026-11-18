@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import classes from './Block.module.css'
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import classes from './Block.module.css';
 
 
 function Block() {
 
-  const { hash_url } = useParams();
+  const { hash_id } = useParams();
+  const navigate = useNavigate();
   const [blockData, setBlockData] = useState(null);
 
   useEffect(() => {
     async function fetchBlock() {
       try {
         // Используем полученный hash_url в запросе к API или функции поиска
-        const response = await fetch(`http://localhost:8000/api/blocks/get/${hash_url}/`, {
+        const response = await fetch(`http://localhost:8000/api/blocks/get/${hash_id}/`, {
           method: 'POST', // Указываем нужный метод
           headers: {
             'Content-Type': 'application/json',
@@ -27,10 +28,10 @@ function Block() {
       }
     }
 
-    if (hash_url) {
+    if (hash_id) {
       fetchBlock();
     }
-  }, [hash_url]); // Зависимость гарантирует повторный вызов, если ссылка изменится
+  }, [hash_id]); // Зависимость гарантирует повторный вызов, если ссылка изменится
 
   if (!blockData) return <div>Загрузка...</div>;
 
@@ -38,12 +39,19 @@ function Block() {
   return (
     <div>
       <div>
-        <h1>Блок: {hash_url}</h1>
-        <p style={{ whiteSpace: 'pre-wrap' }} className={classes.Block__p}>{blockData.block}</p>
+        <h1>Блок: {hash_id}</h1>
+        <p style={{ whiteSpace: 'pre-wrap' }} className={classes.Block__p}>{blockData.text}</p>
       </div>
-      <button>
-        <Link to="/">Создать еще</Link>
-      </button>
+      <div className={classes.Block__under}>
+        <button onClick={() => navigate('/')}>Создать еще</button>
+        <p className={classes.Block__views}>
+          Просмотры: {blockData.views}
+        </p>
+        <p>
+          Дата и время удаления: {blockData.ttl}
+        </p>
+      </div>
+
     </div>
   );
 }
